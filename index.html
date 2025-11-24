@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Shadow Locate 3D - Survival</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="//unpkg.com/globe.gl"></script>
+</head>
+<body>
+
+    <div id="start-screen">
+        <h1 class="title">SHADOW LOCATE</h1>
+        <h2 class="subtitle">SURVIVAL MODE</h2>
+        <p class="desc">Canın bitene kadar devam et!</p>
+        <button class="btn" onclick="initGame()">OYUNA BAŞLA ♫</button>
+    </div>
+
+    <div id="ui-layer">
+        <div class="hud-text">PUAN: <span id="score">0</span></div>
+        <div class="hud-text">GEÇEN SÜRE: <span id="timer">0</span>s</div>
+        <div class="hud-text">CAN: <span id="lives">♥♥♥</span></div>
+        <div class="hud-text" id="feedback"></div>
+    </div>
+
+    <div id="silhouette-overlay">
+        <h2 id="phase-text">3</h2>
+        <img id="shadow-img" src="" alt="Shadow">
+    </div>
+
+    <div id="game-over">
+        <h1 id="end-title" style="font-size: 50px;">OYUN BİTTİ</h1>
+        <h2 id="final-score">Skor: 0</h2>
+        <p id="end-msg" style="color:#aaa;"></p>
+        <button class="btn" onclick="location.reload()">TEKRAR OYNA</button>
+    </div>
+
+    <div id="globeViz"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
