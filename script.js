@@ -8,6 +8,7 @@ function playDlink() { const t = audioCtx.currentTime; const osc = audioCtx.crea
 function playMeh() { const t = audioCtx.currentTime; const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.connect(gain); gain.connect(audioCtx.destination); osc.type='triangle'; osc.frequency.setValueAtTime(400, t); osc.frequency.linearRampToValueAtTime(350, t + 0.4); gain.gain.setValueAtTime(0.2, t); gain.gain.linearRampToValueAtTime(0.01, t + 0.4); osc.start(t); osc.stop(t + 0.4); }
 function playDat() { const t = audioCtx.currentTime; const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.connect(gain); gain.connect(audioCtx.destination); osc.type='sawtooth'; osc.frequency.setValueAtTime(150, t); osc.frequency.linearRampToValueAtTime(50, t + 0.3); gain.gain.setValueAtTime(0.3, t); gain.gain.linearRampToValueAtTime(0.01, t + 0.3); osc.start(t); osc.stop(t + 0.3); }
 
+// --- DATA (AYNI) ---
 const levels = [
     { id: 1, name: "Türkiye", region: "Avrasya / Orta Doğu", lat: 38.96, lng: 35.24, img: "./images/silhouettes/tr.png" },
     { id: 2, name: "İtalya", region: "Güney Avrupa", lat: 41.87, lng: 12.56, img: "./images/silhouettes/it.png" },
@@ -54,7 +55,8 @@ let combo = 0;
 let isHardMode = false;
 let roundTimerInterval = null;
 let roundTimeLeft = 10;
-let playerName = "Anonim"; // Varsayılan isim
+let playerName = "Anonim"; 
+let sessionHighScores = [];
 
 const world = Globe()
     .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
@@ -65,21 +67,47 @@ const world = Globe()
     .onGlobeClick(onGlobeClick)
     (document.getElementById('globeViz'));
 
-// --- OYUN BAŞLATMA MANTIĞI (İSİM KONTROLÜ) ---
+// --- YENİ: OYUN AKIŞI ---
+
+function showTutorial() {
+    const splash = document.getElementById('splash-screen');
+    const tutorial = document.getElementById('tutorial-screen');
+    
+    // Ses motorunu başlat (Tarayıcı izni için)
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    playGlitter();
+
+    splash.style.opacity = 0;
+    setTimeout(() => {
+        splash.style.display = 'none';
+        tutorial.style.display = 'flex';
+        // Fade-in efekti için
+        tutorial.style.opacity = 0;
+        setTimeout(() => { tutorial.style.opacity = 1; }, 10);
+    }, 800);
+}
+
+function closeTutorial() {
+    const tutScreen = document.getElementById('tutorial-screen');
+    const startScreen = document.getElementById('start-screen');
+    tutScreen.style.opacity = 0;
+    setTimeout(() => {
+        tutScreen.style.display = 'none';
+        startScreen.style.display = 'flex'; 
+        startScreen.style.opacity = 0;
+        setTimeout(() => { startScreen.style.opacity = 1; }, 10);
+    }, 500);
+}
+
 function initGame() {
     const input = document.getElementById('player-name-input');
-    
-    // İsim boşsa uyarı ver
     if (input.value.trim() === "") {
         input.classList.add('input-error');
         playDat();
         setTimeout(() => { input.classList.remove('input-error'); }, 300);
         return;
     }
-
-    playerName = input.value.toUpperCase(); // İsmi kaydet
-    
-    if (audioCtx.state === 'suspended') audioCtx.resume();
+    playerName = input.value.toUpperCase(); 
     playGlitter();
     const screen = document.getElementById('start-screen');
     screen.style.opacity = 0;
@@ -91,9 +119,7 @@ function startGame() {
     updateLivesUI();
     document.getElementById('score').innerText = score;
     document.getElementById('round-timer-card').style.display = 'none';
-
     nextRound();
-
     if (totalTimerInterval) clearInterval(totalTimerInterval);
     totalTimerInterval = setInterval(() => {
         if (!gameActive) return;
@@ -199,7 +225,10 @@ function processGuess(clickedLat, clickedLng, distance) {
 
     setTimeout(() => { document.getElementById('result-window').classList.add('active'); }, 1200);
 
-    if (combo >= 3 && !isHardMode) { setTimeout(() => { openHardModeAlert(); }, 2000); return; }
+    if (combo >= 3 && !isHardMode) { 
+        setTimeout(() => { openHardModeAlert(); }, 2000); 
+        return; 
+    }
 
     setTimeout(() => {
         if (lives > 0) { world.pointOfView({ altitude: 2.5 }, 1000); nextRound(); } 
@@ -207,35 +236,43 @@ function processGuess(clickedLat, clickedLng, distance) {
     }, 3200);
 }
 
-function openHardModeAlert() {
-    gameActive = false; // Oyunu dondur
-    
-    // --- EKLENEN SATIR: Arkada kalan sonuç penceresini kapat ---
-    document.getElementById('result-window').classList.remove('active');
-    
-    // Uyarıyı göster
-    document.getElementById('hard-mode-alert').style.display = 'flex';
-    playGlitter();
+function openHardModeAlert() { 
+    gameActive = false; 
+    document.getElementById('result-window').classList.remove('active'); 
+    document.getElementById('hard-mode-alert').style.display = 'flex'; 
+    playGlitter(); 
 }
+
 function closeHardModeAlert() { document.getElementById('hard-mode-alert').style.display = 'none'; isHardMode = true; gameActive = true; document.getElementById('round-timer-card').style.display = 'block'; world.pointOfView({ altitude: 2.5 }, 1000); nextRound(); }
 
-// --- GÜNCELLENMİŞ HIGHSCORE (İSİMLİ) ---
 function updateHighScores(finalScore) {
-    let highScores = JSON.parse(localStorage.getItem('geoGameScores_v2')) || [];
-    
-    // Obje olarak kaydet: {name: 'Ahmet', score: 50}
-    highScores.push({ name: playerName, score: finalScore });
-    highScores.sort((a, b) => b.score - a.score);
-    highScores = highScores.slice(0, 5);
-    localStorage.setItem('geoGameScores_v2', JSON.stringify(highScores));
-    
+    sessionHighScores.push({ name: playerName, score: finalScore });
+    sessionHighScores.sort((a, b) => b.score - a.score);
+    const top5 = sessionHighScores.slice(0, 5);
     const list = document.getElementById('highscore-list');
-    list.innerHTML = highScores.map((s, index) => 
+    list.innerHTML = top5.map((s, index) => 
         `<li>
             <span><span class="player-rank">${index + 1}.</span> ${s.name}</span> 
             <span>${s.score} P</span>
         </li>`
     ).join('');
+}
+
+// --- YENİ: OYUNU SIFIRLAMA (KAPAK EKRANINA DÖNER) ---
+function resetGame() {
+    document.getElementById('game-over').style.display = 'none';
+    // Kapak Ekranını (Splash) tekrar aç
+    const splash = document.getElementById('splash-screen');
+    splash.style.display = 'flex';
+    setTimeout(() => { splash.style.opacity = 1; }, 10);
+    
+    // İsim kutusunu temizle
+    document.getElementById('player-name-input').value = "";
+    
+    // Dünyayı temizle
+    world.arcsData([]);
+    world.ringsData([]);
+    world.pointOfView({ altitude: 2.5 }, 1000);
 }
 
 function useHint() {

@@ -4,19 +4,39 @@
     <meta charset="UTF-8">
     <title>Shadow Locate 3D - Ultimate</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800;900&display=swap" rel="stylesheet">
     <script src="//unpkg.com/globe.gl"></script>
 </head>
 <body>
 
-    <div id="start-screen">
-        <h1 class="title">SHADOW LOCATE</h1>
-        <h2 class="subtitle">SURVIVAL MODE</h2>
-        <p class="desc">Coğrafya bilginle ne kadar hayatta kalabilirsin?</p>
+    <div id="splash-screen">
+        <h1 class="main-title">SHADOW LOCATE</h1>
+        <h2 class="sub-title">3D GEO CHALLENGE</h2>
+        <div class="globe-icon">🌍</div>
+        <button class="btn pulse-btn" onclick="showTutorial()">OYUNA GİRİŞ</button>
+    </div>
+
+    <div id="tutorial-screen" style="display: none;">
+        <h1 class="title" style="font-size: 40px;">NASIL OYNANIR?</h1>
+        <div class="tutorial-box">
+            <ul>
+                <li>👁️ <strong>GÖRSEL HAFIZA:</strong> Silüeti 3 saniye içinde ezberle.</li>
+                <li>🌍 <strong>YERİNİ BUL:</strong> 3D dünya üzerinde ülkeyi bul ve tıkla.</li>
+                <li>🎯 <strong>PUANLAMA:</strong> Yakınlık derecesine göre puan alırsın.</li>
+                <li>❤️ <strong>HAYATTA KAL:</strong> 3 yanlış yaparsan oyun biter.</li>
+                <li>🔥 <strong>ZOR MOD:</strong> 3 doğru yaparsan süre kısıtlaması gelir!</li>
+            </ul>
+        </div>
+        <button class="btn" onclick="closeTutorial()">ANLADIM, DEVAM ET</button>
+    </div>
+
+    <div id="start-screen" style="display: none;">
+        <h1 class="title">SURVIVAL MODE</h1>
+        <p class="desc">Skor tablosuna girmek için adını yaz.</p>
         
         <input type="text" id="player-name-input" class="name-input" placeholder="ADINI YAZ..." maxlength="12" autocomplete="off">
         
-        <button class="btn" onclick="initGame()">OYUNA BAŞLA </button>
+        <button class="btn" onclick="initGame()">OYUNA BAŞLA ♫</button>
     </div>
 
     <div id="ui-sidebar">
@@ -75,7 +95,7 @@
             <ul id="highscore-list"></ul>
         </div>
 
-        <button class="btn" onclick="location.reload()">TEKRAR OYNA</button>
+        <button class="btn" onclick="resetGame()">YENİ OYUNCU / TEKRAR</button>
     </div>
 
     <div id="globeViz"></div>
