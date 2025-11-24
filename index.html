@@ -2,8 +2,9 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Shadow Locate 3D - Survival</title>
+    <title>Shadow Locate 3D - Ultimate</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="//unpkg.com/globe.gl"></script>
 </head>
 <body>
@@ -11,15 +12,52 @@
     <div id="start-screen">
         <h1 class="title">SHADOW LOCATE</h1>
         <h2 class="subtitle">SURVIVAL MODE</h2>
-        <p class="desc">Canın bitene kadar devam et!</p>
-        <button class="btn" onclick="initGame()">OYUNA BAŞLA ♫</button>
+        <p class="desc">Coğrafya bilginle ne kadar hayatta kalabilirsin?</p>
+        
+        <input type="text" id="player-name-input" class="name-input" placeholder="ADINI YAZ..." maxlength="12" autocomplete="off">
+        
+        <button class="btn" onclick="initGame()">OYUNA BAŞLA </button>
     </div>
 
-    <div id="ui-layer">
-        <div class="hud-text">PUAN: <span id="score">0</span></div>
-        <div class="hud-text">GEÇEN SÜRE: <span id="timer">0</span>s</div>
-        <div class="hud-text">CAN: <span id="lives">♥♥♥</span></div>
-        <div class="hud-text" id="feedback"></div>
+    <div id="ui-sidebar">
+        <div class="stat-card">
+            <span class="stat-label">PUAN</span>
+            <span id="score" class="stat-value">0</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">GEÇEN SÜRE</span>
+            <span id="total-timer" class="stat-value">0s</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">CAN</span>
+            <span id="lives" class="stat-value">♥♥♥</span>
+        </div>
+        
+        <div id="round-timer-card" class="stat-card" style="display: none; border-color: #f87171;">
+            <span class="stat-label" style="color: #f87171;">KALAN SÜRE</span>
+            <span id="round-timer" class="stat-value" style="color: #f87171;">10</span>
+        </div>
+
+        <div class="hint-container">
+            <button id="hint-btn" class="hint-btn" onclick="useHint()">💡 İPUCU (-5)</button>
+        </div>
+    </div>
+
+    <div id="hint-window">
+        <div class="hint-title">🔎 BÖLGE İPUCU</div>
+        <div id="hint-text">...</div>
+    </div>
+
+    <div id="hard-mode-alert">
+        <h1>⚠️ ZOR MOD AKTİF! ⚠️</h1>
+        <p>3'te 3 yaptın! Artık her ülke için sadece 10 saniyen var.</p>
+        <button class="btn" onclick="closeHardModeAlert()">MEYDAN OKUMAYI KABUL ET</button>
+    </div>
+
+    <div id="result-window">
+        <div id="result-country">ÜLKE İSMİ</div>
+        <div id="result-status">DURUM</div>
+        <div id="result-distance">0 km</div>
     </div>
 
     <div id="silhouette-overlay">
@@ -28,9 +66,15 @@
     </div>
 
     <div id="game-over">
-        <h1 id="end-title" style="font-size: 50px;">OYUN BİTTİ</h1>
+        <h1 id="end-title">OYUN BİTTİ</h1>
         <h2 id="final-score">Skor: 0</h2>
-        <p id="end-msg" style="color:#aaa;"></p>
+        <p id="end-msg"></p>
+        
+        <div class="highscore-box">
+            <h3>🏆 EN İYİ OYUNCULAR 🏆</h3>
+            <ul id="highscore-list"></ul>
+        </div>
+
         <button class="btn" onclick="location.reload()">TEKRAR OYNA</button>
     </div>
 
