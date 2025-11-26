@@ -1,82 +1,110 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shadow Locate 3D - Ultimate</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800;900&display=swap" rel="stylesheet">
-    <script src="//unpkg.com/globe.gl"></script>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌍</text></svg>">
+    
+    <script src="https://unpkg.com/globe.gl"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body>
 
     <div id="splash-screen">
         <h1 class="main-title">SHADOW LOCATE</h1>
-        <h2 class="sub-title">3D GEO CHALLENGE</h2>
+        <h3 class="credit-text">by Ceren Catak</h3>
         <div class="globe-icon">🌍</div>
-        <button class="btn pulse-btn" onclick="showTutorial()">OYUNA GİRİŞ</button>
+        <button class="btn pulse-btn" onclick="showTutorial()">ENTER GAME</button>
     </div>
 
     <div id="tutorial-screen" style="display: none;">
-        <h1 class="title" style="font-size: 40px;">NASIL OYNANIR?</h1>
-        <div class="tutorial-box">
-            <ul>
-                <li>👁️ <strong>GÖRSEL HAFIZA:</strong> Silüeti 3 saniye içinde ezberle.</li>
-                <li>🌍 <strong>YERİNİ BUL:</strong> 3D dünya üzerinde ülkeyi bul ve tıkla.</li>
-                <li>🎯 <strong>PUANLAMA:</strong> Yakınlık derecesine göre puan alırsın.</li>
-                <li>❤️ <strong>HAYATTA KAL:</strong> 3 yanlış yaparsan oyun biter.</li>
-                <li>🔥 <strong>ZOR MOD:</strong> 3 doğru yaparsan süre kısıtlaması gelir!</li>
-            </ul>
+        <div class="speech-bubble tutorial-bubble">
+            <p id="tutorial-text">...</p>
         </div>
-        <button class="btn" onclick="closeTutorial()">ANLADIM, DEVAM ET</button>
+        <div class="geo-mascot">
+            <div class="mascot-body">
+                <div class="land land-1"></div>
+                <div class="land land-2"></div>
+                <div class="face">
+                    <div class="eye left"></div>
+                    <div class="eye right"></div>
+                    <div class="mouth"></div>
+                    <div class="cheeks"></div>
+                </div>
+            </div>
+            <div class="shadow"></div>
+        </div>
+        <div class="tutorial-controls">
+            <button class="btn-small" onclick="closeTutorial()">SKIP</button>
+            <button class="btn" onclick="nextTutorialStep()" id="next-step-btn">NEXT ➔</button>
+        </div>
     </div>
 
     <div id="start-screen" style="display: none;">
         <h1 class="title">SURVIVAL MODE</h1>
-        <p class="desc">Skor tablosuna girmek için adını yaz.</p>
-        
-        <input type="text" id="player-name-input" class="name-input" placeholder="ADINI YAZ..." maxlength="12" autocomplete="off">
-        
-        <button class="btn" onclick="initGame()">OYUNA BAŞLA ♫</button>
+        <p class="desc">Enter your name to join the leaderboard.</p>
+        <input type="text" id="player-name-input" class="name-input" placeholder="YOUR NAME..." maxlength="12" autocomplete="off">
+        <button class="btn" onclick="initGame()">START GAME ♫</button>
     </div>
 
     <div id="ui-sidebar">
         <div class="stat-card">
-            <span class="stat-label">PUAN</span>
+            <span class="stat-label">SCORE</span>
             <span id="score" class="stat-value">0</span>
         </div>
         <div class="stat-card">
-            <span class="stat-label">GEÇEN SÜRE</span>
+            <span class="stat-label">TIME</span>
             <span id="total-timer" class="stat-value">0s</span>
         </div>
         <div class="stat-card">
-            <span class="stat-label">CAN</span>
+            <span class="stat-label">LIVES</span>
             <span id="lives" class="stat-value">♥♥♥</span>
         </div>
         
         <div id="round-timer-card" class="stat-card" style="display: none; border-color: #f87171;">
-            <span class="stat-label" style="color: #f87171;">KALAN SÜRE</span>
+            <span class="stat-label" style="color: #f87171;">TIME LEFT</span>
             <span id="round-timer" class="stat-value" style="color: #f87171;">10</span>
-        </div>
-
-        <div class="hint-container">
-            <button id="hint-btn" class="hint-btn" onclick="useHint()">💡 İPUCU (-5)</button>
         </div>
     </div>
 
-    <div id="hint-window">
-        <div class="hint-title">🔎 BÖLGE İPUCU</div>
-        <div id="hint-text">...</div>
+    <div id="game-companion" onclick="useHint()">
+        <div id="companion-bubble" class="speech-bubble">Need a hint?</div>
+        <div class="geo-mascot small-mascot" id="companion-mascot">
+            <div class="mascot-body">
+                <div class="land land-1"></div>
+                <div class="land land-2"></div>
+                <div class="face">
+                    <div class="eye left"></div>
+                    <div class="eye right"></div>
+                    <div class="mouth"></div>
+                    <div class="cheeks"></div>
+                </div>
+            </div>
+        </div>
+        <div class="mascot-label">💡 ASK FOR HINT (-5)</div>
     </div>
 
     <div id="hard-mode-alert">
-        <h1>⚠️ ZOR MOD AKTİF! ⚠️</h1>
-        <p>3'te 3 yaptın! Artık her ülke için sadece 10 saniyen var.</p>
-        <button class="btn" onclick="closeHardModeAlert()">MEYDAN OKUMAYI KABUL ET</button>
+        <div class="speech-bubble alert-bubble">
+            <p><strong>YOU ARE ON FIRE!</strong><br>🔥 <strong>HARD MODE</strong> is starting! 🔥<br>You only have 10 seconds per round!</p>
+        </div>
+        <div class="geo-mascot">
+            <div class="mascot-body">
+                <div class="land land-1"></div>
+                <div class="land land-2"></div>
+                <div class="face"><div class="eye left"></div><div class="eye right"></div><div class="mouth"></div><div class="cheeks"></div></div>
+            </div>
+        </div>
+        <button class="btn" onclick="closeHardModeAlert()" style="margin-top: 20px;">ACCEPT CHALLENGE</button>
     </div>
 
     <div id="result-window">
-        <div id="result-country">ÜLKE İSMİ</div>
-        <div id="result-status">DURUM</div>
+        <div id="result-country">COUNTRY NAME</div>
+        <div id="result-status">STATUS</div>
         <div id="result-distance">0 km</div>
     </div>
 
@@ -86,16 +114,17 @@
     </div>
 
     <div id="game-over">
-        <h1 id="end-title">OYUN BİTTİ</h1>
-        <h2 id="final-score">Skor: 0</h2>
+        <h1 id="end-title">GAME OVER</h1>
+        <h2 id="final-score">Score: 0</h2>
         <p id="end-msg"></p>
-        
         <div class="highscore-box">
-            <h3>🏆 EN İYİ OYUNCULAR 🏆</h3>
+            <h3>🏆 TOP PLAYERS 🏆</h3>
             <ul id="highscore-list"></ul>
         </div>
-
-        <button class="btn" onclick="resetGame()">YENİ OYUNCU / TEKRAR</button>
+        <div style="display: flex; gap: 10px; justify-content: center;">
+            <button class="btn" onclick="resetGame()">PLAY AGAIN</button>
+            <button class="btn" style="background: #3b82f6;" onclick="shareScore()">📤 SHARE SCORE</button>
+        </div>
     </div>
 
     <div id="globeViz"></div>
