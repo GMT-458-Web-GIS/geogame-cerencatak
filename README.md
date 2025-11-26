@@ -1,6 +1,8 @@
 # SHADOW LOCATE 
 
 An interactive 3D geo-memory game built with HTML, CSS, JavaScript, and a rotatable 3D globe.
+---
+
 PLAY!: https://gmt-458-web-gis.github.io/geogame-cerencatak/
 ---
 
